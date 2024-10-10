@@ -160,4 +160,4 @@ local create_gradient = function()
       return drawingObject;
 end;
 
-return gradient_square;
+return create_gradient;
