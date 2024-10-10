@@ -1,6 +1,8 @@
 local table_insert = table.insert;
 local table_remove = table.remove;
 
+local math_ceil   = math.ceil;
+
 local cached_squares = _G.cached_squares or {};
 _G.cached_squares = cached_squares;
 
@@ -21,7 +23,7 @@ local create_gradient = function()
             Position = Vector2.new();
       };
       local hidden_properties = {
-            required_squares = (properties.Size.Y+1) // properties.PixelSize;
+            required_squares = (math_ceil(properties.Size.Y) + properties.PixelSize / 2) // properties.PixelSize;
             cached_squares = {};
       };
 
@@ -50,8 +52,8 @@ local create_gradient = function()
                   
                   __newindex(square, 'Position', position + Vector2.new(0, (i-1)*pixel_size));
                   __newindex(square, 'Size', Vector2.new(size.X, math.min(pixel_size, pixels_left)));
-                  __newindex(square, 'Color', properties.ColorStart:Lerp(properties.ColorEnd, i/#squares));
-                  
+                  __newindex(square, 'Color', properties.ColorStart:Lerp(properties.ColorEnd, i / #squares));
+
                   pixels_left -= pixel_size;
             end;
       end;
@@ -128,10 +130,16 @@ local create_gradient = function()
             properties[index] = newindex;
 
             if (index == 'Size' or index == 'PixelSize') then
-                  hidden_properties.required_squares = (properties.Size.Y+1) // properties.PixelSize;
-                  if (properties.Visible) then
+                  local size = properties.Size;
+
+                  local pixelsize = properties.PixelSize;
+
+                  hidden_properties.required_squares = (math_ceil(size.Y) + pixelsize / 2) // pixelsize;
+                  if (properties.Visible and size.Y > 0 and size.X > 0) then
                         recache_squares();
                         update_size();
+                  elseif (size.Y <= 0 or size.X <= 0) then
+                        free_squares();
                   end;
             elseif (index == 'Position') then
                   if (properties.Visible) then
@@ -145,9 +153,13 @@ local create_gradient = function()
                         free_squares();
                   end;
             elseif ((index == 'Transparency' or index == 'ZIndex') and properties.Visible) then
-                  local squares = hidden_properties.cached_squares;
-                  for i = 1, #squares do
-                        __newindex(squares[i], index, newindex);
+                  if (properties.Transparency <= 0) then
+                        free_squares();
+                  else
+                        local squares = hidden_properties.cached_squares;
+                        for i = 1, #squares do
+                              __newindex(squares[i], index, newindex);
+                        end;
                   end;
             elseif ( (index == 'ColorStart' or index == 'ColorEnd') and properties.Visible) then
                   local squares = hidden_properties.cached_squares;
