@@ -11,7 +11,7 @@ local __newindex = square_mt.__newindex;
 local create_gradient = function()
       local properties = {
             Visible = false;
-            --Transparency = 1;
+            Transparency = 1;
             ZIndex = 0;
 
             ColorStart = Color3.new();
