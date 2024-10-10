@@ -47,7 +47,7 @@ local create_gradient = function()
 
             for i = 1, #squares do
                   local square = squares[i];
-
+                  
                   __newindex(square, 'Position', position + Vector2.new(0, (i-1)*pixel_size));
                   __newindex(square, 'Size', Vector2.new(size.X, math.min(pixel_size, pixels_left)));
                   __newindex(square, 'Color', properties.ColorStart:Lerp(properties.ColorEnd, i/#squares));
@@ -81,7 +81,7 @@ local create_gradient = function()
                         __newindex(square, 'Filled', true);
                         __newindex(square, 'Thickness', 1);
                   end;
-                  __newindex(square, 'Visible', properties.Visible);
+                  __newindex(square, 'Visible', true);
                   __newindex(square, 'Transparency', properties.Transparency);
                   __newindex(square, 'ZIndex', properties.ZIndex);
 
@@ -140,6 +140,7 @@ local create_gradient = function()
             elseif (index == 'Visible') then
                   if (newindex) then
                         recache_squares();
+                        update_size();
                   else
                         free_squares();
                   end;
@@ -153,8 +154,6 @@ local create_gradient = function()
                   for i = 1, #squares do
                         __newindex(squares[i], 'Color', properties.ColorStart:Lerp(properties.ColorEnd, i/#squares));
                   end;
-            else
-                  warn(index);
             end;
       end;
       return drawingObject;
