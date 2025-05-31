@@ -1,30 +1,30 @@
-local signal_handle		= {};
-signal_handle.__index 		= signal_handle;
+local signalHandler           = {};
+signalHandler.__index 		= signalHandler;
 
-signal_handle.new = function(signal)
+signalHandler.new = function(signal)
       local self = setmetatable({ 
 
             active      = true;
             signal      = signal;
 
             connections = {};
-      }, signal_handle);
+      }, signalHandler);
 
 
       if (self.signal) then
-            self.signal_connection = self.signal:Connect(function(...) self:Fire(...); end);
+            self.signalConnection = self.signal:Connect(function(...) self:Fire(...); end);
       end;
 
       return self;
 end;
 
-function signal_handle:Fire(...)
+function signalHandler:Fire(...)
       local connections = self.connections;
       for i = 1, #connections do
             task.spawn(connections[i], ...);
       end;
 end;
-function signal_handle:Connect(_function)
+function signalHandler:Connect(_function)
       local connectionObject = {};
 
       connectionObject.Connected = true;
@@ -39,16 +39,16 @@ function signal_handle:Connect(_function)
       table_insert(self.connections, _function);
       return connectionObject;
 end;
-function signal_handle:Remove()
+function signalHandler:Remove()
       if (not self.active) then
             return;
       end;
       self.active = false;
       self.connections = {};
 
-      if (self.signal_connection) then
-            self.signal_connection:Disconnect();
+      if (self.signalConnection) then
+            self.signalConnection:Disconnect();
       end;
 end;
 
-return signal_handle;
+return signalHandler;
