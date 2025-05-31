@@ -1,3 +1,7 @@
+local table_insert            = table.insert;
+local table_remove            = table.remove;
+local table_find              = table.find;
+
 local signalHandler           = {};
 signalHandler.__index 		= signalHandler;
 
@@ -33,7 +37,7 @@ function signalHandler:Connect(_function)
                   return;
             end;
             connectionObject.Connected = false;
-            table_remove( self.connection, table_find(self.connection, _function) );
+            table_remove( self.connections, table_find(self.connections, _function) );
       end;
 
       table_insert(self.connections, _function);
